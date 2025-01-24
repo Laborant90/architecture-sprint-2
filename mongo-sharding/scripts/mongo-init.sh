@@ -1,44 +1,44 @@
 #!/bin/bash
-docker compose exec -T configSrv mongosh --port 27020 --quiet <<EOF
+docker compose exec -T t2-configSrv mongosh --port 27020 --quiet <<EOF
 rs.initiate(
   {
     _id : "config_server",
     configsvr: true,
     members: [
-      { _id : 0, host : "configSrv:27020" }
+      { _id : 0, host : "t2-configSrv:27020" }
     ]
   }
 );
 exit();
 EOF
 
-docker compose exec -T mongodb1-shard1 mongosh --port 27018 --quiet <<EOF
+docker compose exec -T t2-mongodb1-shard1 mongosh --port 27018 --quiet <<EOF
 rs.initiate(
   {
-    _id : "mongodb1-shard1",
+    _id : "t2-mongodb1-shard1",
     members: [
-      { _id : 0, host : "mongodb1-shard1:27018" }
+      { _id : 0, host : "t2-mongodb1-shard1:27018" }
     ]
   }
 );
 exit();
 EOF
 
-docker compose exec -T mongodb1-shard2 mongosh --port 27019 --quiet <<EOF
+docker compose exec -T t2-mongodb1-shard2 mongosh --port 27019 --quiet <<EOF
 rs.initiate(
   {
-    _id : "mongodb1-shard2",
+    _id : "t2-mongodb1-shard2",
     members: [
-      { _id : 1, host : "mongodb1-shard2:27019" }
+      { _id : 1, host : "t2-mongodb1-shard2:27019" }
     ]
   }
 );
 exit();
 EOF
 
-docker compose exec -T mongodb1 mongosh --port 27017 --quiet <<EOF
-sh.addShard( "mongodb1-shard1/mongodb1-shard1:27018");
-sh.addShard( "mongodb1-shard2/mongodb1-shard2:27019");
+docker compose exec -T t2-mongodb1 mongosh --port 27017 --quiet <<EOF
+sh.addShard( "t2-mongodb1-shard1/t2-mongodb1-shard1:27018");
+sh.addShard( "t2-mongodb1-shard2/t2-mongodb1-shard2:27019");
 sh.enableSharding("somedb");
 sh.shardCollection("somedb.helloDoc", { "name" : "hashed" } )
 use somedb

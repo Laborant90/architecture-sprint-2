@@ -1,21 +1,21 @@
 services:
-  pymongo_api:
-    container_name: pymongo_api
+  t2-pymongo_api:
+    container_name: t2-pymongo_api
     build:
       context: api_app
       dockerfile: Dockerfile
     image: kazhem/pymongo_api:1.0.0
     depends_on:
-      - mongodb1
+      - t2-mongodb1
     ports:
       - 8080:8080
     environment:
-      MONGODB_URL: "mongodb://mongodb1"
+      MONGODB_URL: "mongodb://t2-mongodb1"
       MONGODB_DATABASE_NAME: "somedb"
 
-  configSrv:
+  t2-configSrv:
     image: mongo:latest # docker образ
-    container_name: configSrv
+    container_name: t2-configSrv
     restart: always
     ports:
       - "27020:27020"
@@ -23,7 +23,7 @@ services:
       app-network:
         ipv4_address: 173.17.0.10
     volumes:
-      - config-data:/data/db
+      - t2-config-data:/data/db
     command:
       [
         "--configsvr",
@@ -38,9 +38,9 @@ services:
       interval: 5s
       start_period: 10s
 
-  mongodb1-shard1:
+  t2-mongodb1-shard1:
     image: mongo:latest
-    container_name: mongodb1-shard1
+    container_name: t2-mongodb1-shard1
     restart: always
     ports:
       - "27018:27018"
@@ -48,12 +48,12 @@ services:
       app-network:
         ipv4_address: 173.17.0.9
     volumes:
-      - mongodb1-shard1-data:/data/db
+      - t2-mongodb1-shard1-data:/data/db
     command:
       [
         "--shardsvr",
         "--replSet",
-        "mongodb1-shard1",
+        "t2-mongodb1-shard1",
         "--bind_ip_all",
         "--port",
         "27018"
@@ -63,9 +63,9 @@ services:
       interval: 5s
       start_period: 10s
 
-  mongodb1-shard2:
+  t2-mongodb1-shard2:
     image: mongo:latest
-    container_name: mongodb1-shard2
+    container_name: t2-mongodb1-shard2
     restart: always
     ports:
       - "27019:27019"
@@ -73,12 +73,12 @@ services:
       app-network:
         ipv4_address: 173.17.0.8
     volumes:
-      - mongodb1-shard2-data:/data/db
+      - t2-mongodb1-shard2-data:/data/db
     command:
       [
         "--shardsvr",
         "--replSet",
-        "mongodb1-shard2",
+        "t2-mongodb1-shard2",
         "--bind_ip_all",
         "--port",
         "27019"
@@ -88,16 +88,16 @@ services:
       interval: 5s
       start_period: 10s
 
-  mongodb1:
+  t2-mongodb1:
     image: dh-mirror.gitverse.ru/mongo:latest
-    container_name: mongodb1
+    container_name: t2-mongodb1
     restart: always
     ports:
       - "27017:27017"
     expose:
       - "27017"
     depends_on:
-      - configSrv
+      - t2-configSrv
     networks:
       app-network:
         ipv4_address: 173.17.0.7
@@ -105,7 +105,7 @@ services:
       [
         "mongos",
         "--configdb",
-        "config_server/configSrv:27020",
+        "config_server/t2-configSrv:27020",
         "--bind_ip_all",
         "--port",
         "27017"
@@ -117,6 +117,7 @@ services:
 
 networks:
   app-network:
+    name: t2network
     driver: bridge
     ipam:
       driver: default
@@ -125,6 +126,6 @@ networks:
 
 name: mongo-sharding
 volumes:
-  config-data:
-  mongodb1-shard1-data:
-  mongodb1-shard2-data:
+  t2-config-data:
+  t2-mongodb1-shard1-data:
+  t2-mongodb1-shard2-data:

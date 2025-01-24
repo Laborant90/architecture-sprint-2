@@ -13,7 +13,7 @@ services:
       app-network:
         ipv4_address: 173.17.1.20
     environment:
-      MONGODB_URL: "mongodb://t3-mongodb1"
+      MONGODB_URL: "mongodb://t3-mongodb1:27020"
       MONGODB_DATABASE_NAME: "somedb"
 
   t3-configSrv:
@@ -26,7 +26,7 @@ services:
       app-network:
         ipv4_address: 173.17.1.10
     volumes:
-      - config-data:/data/db
+      - t3-config-data:/data/db
     command:
       [
         "--configsvr",
@@ -43,7 +43,7 @@ services:
 
   t3-mongodb1-shard1:
     image: mongo:latest
-    container_name: mongodb1-shard1
+    container_name: t3-mongodb1-shard1
     restart: always
     ports:
       - "27018:27018"
@@ -56,7 +56,7 @@ services:
       [
         "--shardsvr",
         "--replSet",
-        "mongodb1-shard1-rs",
+        "t3-mongodb1-shard1-rs",
         "--bind_ip_all",
         "--port",
         "27018"
@@ -165,7 +165,7 @@ services:
 
   t3-mongodb1-shard2-repl2:
     image: mongo:latest
-    container_name: mongodb1-shard2-repl2
+    container_name: t3-mongodb1-shard2-repl2
     restart: always
     ports:
       - "27028:27028"
@@ -177,7 +177,7 @@ services:
     command:
       [
         "--replSet",
-        "mongodb1-shard2-rs",
+        "t3-mongodb1-shard2-rs",
         "--bind_ip_all",
         "--port",
         "27028"
@@ -219,9 +219,9 @@ networks:
       config:
         - subnet: 173.17.1.0/24
 
-name: mongo-sharding
+name: mongo-sharding-repl
 volumes:
-  config-data:
+  t3-config-data:
   t3-mongodb1-shard1-data:
   t3-mongodb1-shard1-repl1-data:
   t3-mongodb1-shard1-repl2-data:

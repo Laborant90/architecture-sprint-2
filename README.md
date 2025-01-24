@@ -95,3 +95,22 @@ docker compose down
 ```shell
  
 ```
+
+Проверяем запуск приложения
+
+curl -X 'GET' \
+'http://localhost:8080' \
+-H 'accept: application/json'
+
+
+{"mongo_topology_type":"Sharded","mongo_replicaset_name":null,"mongo_db":"somedb","read_preference":"Primary()","mongo_nodes":[["t3-mongodb1",27020]],"mongo_primary_host":null,"mongo_secondary_hosts":[],"mongo_address":["t3-mongodb1",27020],"mongo_is_primary":true,"mongo_is_mongos":true,"collections":{"helloDoc":{"documents_count":1000}},"shards":{"t3-mongodb1-shard1-rs":"t3-mongodb1-shard1-rs/t3-mongodb1-shard1:27018,t3-mongodb1-shard1-repl1:27025,t3-mongodb1-shard1-repl2:27026","t3-mongodb1-shard2-rs":"t3-mongodb1-shard2-rs/t3-mongodb1-shard2:27019,t3-mongodb1-shard2-repl1:27027,t3-mongodb1-shard2-repl2:27028"},"cache_enabled":false,"status":"OK"}
+
+curl -X 'GET' \
+'http://localhost:8080/helloDoc/count' \
+-H 'accept: application/json'
+
+{
+"status": "OK",
+"mongo_db": "somedb",
+"items_count": 1000
+}
