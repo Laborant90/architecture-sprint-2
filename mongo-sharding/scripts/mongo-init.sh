@@ -12,6 +12,8 @@ rs.initiate(
 exit();
 EOF
 
+sleep 10s
+
 docker compose exec -T t2-mongodb1-shard1 mongosh --port 27018 --quiet <<EOF
 rs.initiate(
   {
@@ -24,6 +26,8 @@ rs.initiate(
 exit();
 EOF
 
+sleep 10s
+
 docker compose exec -T t2-mongodb1-shard2 mongosh --port 27019 --quiet <<EOF
 rs.initiate(
   {
@@ -35,6 +39,8 @@ rs.initiate(
 );
 exit();
 EOF
+
+sleep 10s
 
 docker compose exec -T t2-mongodb1 mongosh --port 27020 --quiet <<EOF
 sh.addShard( "t2-mongodb1-shard1/t2-mongodb1-shard1:27018");

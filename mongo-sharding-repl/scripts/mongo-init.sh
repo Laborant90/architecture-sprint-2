@@ -12,6 +12,8 @@ rs.initiate(
 exit();
 EOF
 
+sleep 10s
+
 # создаём набор реплик mongodb1-shard1-rs
 docker compose exec -T t3-mongodb1-shard1 mongosh --port 27018 --quiet <<EOF
 rs.initiate(
@@ -24,6 +26,8 @@ rs.initiate(
 })
 exit();
 EOF
+
+sleep 10s
 
 # создаём набор реплик mongodb1-shard2-rs
 docker compose exec -T t3-mongodb1-shard2 mongosh --port 27019 --quiet <<EOF
@@ -38,6 +42,8 @@ rs.initiate(
 exit();
 EOF
 
+sleep 10s
+
 docker compose exec -T t3-mongodb1 mongosh --port 27020 --quiet <<EOF
 sh.addShard( "t3-mongodb1-shard1-rs/t3-mongodb1-shard1:27018");
 sh.addShard( "t3-mongodb1-shard2-rs/t3-mongodb1-shard2:27019");
@@ -51,6 +57,8 @@ docker compose exec -T t3-mongodb1-shard1 mongosh --port 27018 --quiet <<EOF
 rs.conf();
 exit();
 EOF
+
+sleep 10s
 
 docker compose exec -T t3-mongodb1 mongosh --port 27020 --quiet <<EOF
 use somedb
