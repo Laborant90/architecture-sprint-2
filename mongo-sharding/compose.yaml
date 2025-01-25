@@ -1,5 +1,5 @@
 services:
-  t2-pymongo_api:
+  pymongo_api:
     container_name: t2-pymongo_api
     build:
       context: api_app
@@ -9,8 +9,11 @@ services:
       - t2-mongodb1
     ports:
       - 8080:8080
+    networks:
+      app-network:
+        ipv4_address: 173.17.0.20
     environment:
-      MONGODB_URL: "mongodb://t2-mongodb1"
+      MONGODB_URL: "mongodb://t2-mongodb1:27020"
       MONGODB_DATABASE_NAME: "somedb"
 
   t2-configSrv:
@@ -18,7 +21,7 @@ services:
     container_name: t2-configSrv
     restart: always
     ports:
-      - "27020:27020"
+      - "27017:27017"
     networks:
       app-network:
         ipv4_address: 173.17.0.10
@@ -31,7 +34,7 @@ services:
         "config_server",
         "--bind_ip_all",
         "--port",
-        "27020"
+        "27017"
       ]
     healthcheck:
       test: [ "CMD", "mongo", "--eval", "db.adminCommand('ping')" ]
@@ -46,7 +49,7 @@ services:
       - "27018:27018"
     networks:
       app-network:
-        ipv4_address: 173.17.0.9
+        ipv4_address: 173.17.0.11
     volumes:
       - t2-mongodb1-shard1-data:/data/db
     command:
@@ -71,7 +74,7 @@ services:
       - "27019:27019"
     networks:
       app-network:
-        ipv4_address: 173.17.0.8
+        ipv4_address: 173.17.0.14
     volumes:
       - t2-mongodb1-shard2-data:/data/db
     command:
@@ -89,26 +92,22 @@ services:
       start_period: 10s
 
   t2-mongodb1:
-    image: dh-mirror.gitverse.ru/mongo:latest
+    image: mongo:latest
     container_name: t2-mongodb1
     restart: always
     ports:
-      - "27017:27017"
-    expose:
-      - "27017"
-    depends_on:
-      - t2-configSrv
+      - "27020:27020"
     networks:
       app-network:
-        ipv4_address: 173.17.0.7
+        ipv4_address: 173.17.0.17
     command:
       [
         "mongos",
         "--configdb",
-        "config_server/t2-configSrv:27020",
+        "config_server/t2-configSrv:27017",
         "--bind_ip_all",
         "--port",
-        "27017"
+        "27020"
       ]
     healthcheck:
       test: [ "CMD", "mongo", "--eval", "db.adminCommand('ping')" ]
@@ -117,12 +116,12 @@ services:
 
 networks:
   app-network:
-    name: t2network
+    name: t2-network
     driver: bridge
     ipam:
       driver: default
       config:
-        - subnet: 173.17.0.0/16
+        - subnet: 173.17.0.0/24
 
 name: mongo-sharding
 volumes:

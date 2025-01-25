@@ -212,7 +212,7 @@ services:
 
 networks:
   app-network:
-    name: t3network
+    name: t3-network
     driver: bridge
     ipam:
       driver: default

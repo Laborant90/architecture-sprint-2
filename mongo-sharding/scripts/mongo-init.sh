@@ -1,11 +1,11 @@
 #!/bin/bash
-docker compose exec -T t2-configSrv mongosh --port 27020 --quiet <<EOF
+docker compose exec -T t2-configSrv mongosh --port 27017 --quiet <<EOF
 rs.initiate(
   {
     _id : "config_server",
     configsvr: true,
     members: [
-      { _id : 0, host : "t2-configSrv:27020" }
+      { _id : 0, host : "t2-configSrv:27017" }
     ]
   }
 );
@@ -36,7 +36,7 @@ rs.initiate(
 exit();
 EOF
 
-docker compose exec -T t2-mongodb1 mongosh --port 27017 --quiet <<EOF
+docker compose exec -T t2-mongodb1 mongosh --port 27020 --quiet <<EOF
 sh.addShard( "t2-mongodb1-shard1/t2-mongodb1-shard1:27018");
 sh.addShard( "t2-mongodb1-shard2/t2-mongodb1-shard2:27019");
 sh.enableSharding("somedb");
